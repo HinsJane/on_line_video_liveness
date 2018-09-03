@@ -51,6 +51,7 @@ void MainWindow::readFrame()
 //        clock_t begin = clock();
         if(!frame.empty())
         {
+//            qDebug() <<"[Info]: Frame shape: " << frame.rows <<" x " << frame.cols;
             if(needFaceDetectionOrNot){
                 if(FaceDetectionIsOK)
                 {
@@ -88,7 +89,7 @@ void MainWindow::readFrame()
     //                    clock_t end = clock();
                         double timestamp = cv::getTickCount() / cv::getTickFrequency();
                         cv::updateMotionHistory(diff, history, timestamp, MHI_DURATION);
-                        cout <<"[Info]: History shape: " << history.rows <<" x " << history.cols << endl;
+                        qDebug() <<"[Info]: History shape: " << history.rows <<" x " << history.cols;
                         double MIN, MAX;
                         cv::minMaxLoc(history, &MIN, &MAX);
                         Mat history_rgb;
@@ -105,127 +106,134 @@ void MainWindow::readFrame()
                         prev_frame = curr_frame;
 //                        if (cv::waitKey(1) == 27)
 //                            exit(EXIT_SUCCESS);
-                    }
-
-                    if(faces.size() !=0)
-                    {
-                        cout << "[Info]: Face detected ------------ > > >\n";
-                        max_face_index = maxFace(faces);
-                        cv::Rect face_rect = faces.at(max_face_index);
-
-                        int left = face_rect.x;
-                        int top = face_rect.y;
-                        int width = face_rect.width;
-                        int height = face_rect.height;
-                        int right = left + width;
-                        int bottom = top + height;
-
-                        int left_ext, top_ext, width_ext, height_ext;
-
-                        if((left - width) <= 0)
-                            left_ext = 0;
-                        else
-                            left_ext = left - width;
-
-                        if((top - height) <= 0)
-                            top_ext = 0;
-                        else
-                            top_ext = top - height;
-
-                        if((right + width) >= history_gray.cols)
-                            width_ext = history_gray.cols - left_ext;
-                        else
-                            width_ext = right + width - left_ext;
-
-                        if((bottom  + height) >= history_gray.rows)
-                            height_ext = history_gray.rows - top_ext;
-                        else
-                            height_ext = bottom + height - top_ext;
-
-                        Rect face_rect_ext = Rect(left_ext, top_ext, width_ext, height_ext);
-
-                        Mat face_motion_ext = history_gray(face_rect_ext);
-                        int roi_size = 128;
-//                        cv::resize(face_motion_ext, face_motion_ext,Size(roi_size,roi_size));
-//                        float motion_info;
-//                        motion_info = cv::sum(face_motion_ext)[0] / (roi_size * roi_size);
-//                        ui->label_show_motion->setText(QString::number(motion_info));
-
-//                        if (motion_info >= 1.0){
-//                            Mat xy[2];
-//                            cv::split(optical_res,xy);
-//                            Mat magnitude, angle;
-//                            cv::cartToPolar(xy[0], xy[1], magnitude, angle, true);
-
-//                            int height_above, height_below, height_min;
-//                            height_above = top - top_ext;
-//                            height_below = height_ext + top_ext - (height + top);
-//                            height_min = std::min(height_above, height_below);
-
-//                            Rect above_face_rect = Rect(left, top - height_min, width, height_min);
-//                            Rect below_face_rect = Rect(left, top + height, width, height_min);
-
-////                            count << "[Info]: " << ""
-
-//                            Mat above_face_mag_roi = magnitude(above_face_rect);
-//                            Mat above_face_ang_roi = angle(above_face_rect);
-
-//                            Mat below_face_mag_roi = magnitude(below_face_rect);
-//                            Mat below_face_ang_roi = angle(below_face_rect);
-
-//                            float above_mean_mag, above_mean_ang, below_mean_mag, below_mean_ang;
-
-//                            above_mean_mag = cv::sum(above_face_mag_roi)[0] / (width * height_min);
-//                            above_mean_ang = cv::sum(above_face_ang_roi)[0] / (width * height_min);
-
-//                            below_mean_mag = cv::sum(below_face_mag_roi)[0] / (width * height_min);
-//                            below_mean_ang = cv::sum(below_face_ang_roi)[0] / (width * height_min);
-////                            float vof_above_data[] = {above_mean_mag, above_mean_ang};
-////                            float vof_below_data[] = {below_mean_mag, below_mean_ang};
-////                            Mat vof_above = Mat(2, 1, CV_32F, vof_above_data);
-////                            Mat vof_below = Mat(2, 1, CV_32F, vof_below_data);
-
-//                            Mat vof_above, vof_below;
-//                            vof_above.push_back(above_mean_mag);
-//                            vof_above.push_back(above_mean_ang);
-//                            vof_below.push_back(below_mean_mag);
-//                            vof_below.push_back(below_mean_ang);
-//                            double ab = vof_above.dot(vof_below);
-//                            double aa = vof_above.dot(vof_above);
-//                            double bb = vof_below.dot(vof_below);
-//                            double cos_sim_opt_flow = -ab / std::sqrt(aa * bb);
-//                            ui->label_show_OF->setText(QString::number(cos_sim_opt_flow));
-//                        }
 
 
-                        //TODO:
-                        // face roi based motion detection and left-right roi based histogram of
-                        // optical flow matching for jilter detection
+                        if(faces.size() !=0)
+                        {
+                            qDebug() << "[Info]: Face detected ------------ > > >";
+                            max_face_index = maxFace(faces);
+                            cv::Rect face_rect = faces.at(max_face_index);
 
-//                        needFaceDetectionOrNot = false;
+                            int left, top, width, height, right, bottom;
 
-//                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
-//                        dlib::assign_image(img, dlib::cv_image<unsigned char>(image_gray));
-//                        int face_center_x = face_rect.x + cvRound(face_rect.width / 2.0);
-//                        int face_center_y = face_rect.y + cvRound(face_rect.height / 2.0);
-//                        tracker.start_track(img,
-//                                            centered_rect(dlib::point(face_center_x,face_center_y),
-//                                                          int(face_rect.width), int(face_rect.height)));
-                        Mat face_img = frame(face_rect);
-//                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
-                        cv::resize(face_img, face_img,Size(128,128));
-                        Mat face_img_rgb;
-                        cv::cvtColor(face_img, face_img_rgb, cv::COLOR_BGR2RGB);
-                        QImage qimage_face = QImage((const unsigned char*)(face_img_rgb.data),
-                                                    face_img_rgb.cols, face_img_rgb.rows,
-                                                    face_img_rgb.cols*face_img_rgb.channels(),
-                                                    QImage::Format_RGB888);
-                        ui->label_face->setPixmap(QPixmap::fromImage(qimage_face));
-                        ui->label_face->resize(face_img.cols, face_img.rows);
-//                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
-                    }else
-                    {
-                        ui->label_face->clear();
+                            left = face_rect.x;
+                            top = face_rect.y;
+                            width = face_rect.width;
+                            height = face_rect.height;
+                            right = left + width;
+                            bottom = top + height;
+
+                            int left_ext, top_ext, width_ext, height_ext;
+
+                            if((left - width) <= 0)
+                                left_ext = 0;
+                            else
+                                left_ext = left - width;
+
+                            if((top - height) <= 0)
+                                top_ext = 0;
+                            else
+                                top_ext = top - height;
+
+                            if((right + width) >= frame.cols)
+                                width_ext = frame.cols - left_ext;
+                            else
+                                width_ext = right + width - left_ext;
+
+                            if((bottom  + height) >= frame.rows)
+                                height_ext = frame.rows - top_ext;
+                            else
+                                height_ext = bottom + height - top_ext;
+
+                            Rect face_rect_ext = Rect(left_ext, top_ext, width_ext, height_ext);
+                            qDebug() << "[Info]: Face roi extended: " << face_rect_ext.x << " ," << face_rect_ext.y <<" ,"<< face_rect_ext.width << " ," << face_rect_ext.height;
+
+                            Mat face_motion_ext = history_gray(face_rect_ext);
+//                            Mat face_motion = history_gray(face_rect);
+                            int roi_size = 128;
+//                            cv::resize(face_motion, face_motion,Size(roi_size,roi_size));
+                            cv::resize(face_motion_ext, face_motion_ext,Size(roi_size,roi_size));
+                            float motion_info;
+                            motion_info = cv::sum(face_motion_ext)[0] / (roi_size * roi_size);
+                            ui->label_show_motion->setText(QString::number(motion_info));
+
+                            if (motion_info >= 1.0){
+                                Mat xy[2];
+                                cv::split(optical_res,xy);
+                                Mat magnitude, angle;
+                                cv::cartToPolar(xy[0], xy[1], magnitude, angle, true);
+
+                                int height_above, height_below, height_min;
+                                height_above = top - top_ext;
+                                height_below = height_ext + top_ext - (height + top);
+                                height_min = std::min(height_above, height_below);
+
+                                Rect above_face_rect = Rect(left, top - height_min, width, height_min);
+                                Rect below_face_rect = Rect(left, top + height, width, height_min);
+
+    //                            count << "[Info]: " << ""
+
+                                Mat above_face_mag_roi = magnitude(above_face_rect);
+                                Mat above_face_ang_roi = angle(above_face_rect);
+
+                                Mat below_face_mag_roi = magnitude(below_face_rect);
+                                Mat below_face_ang_roi = angle(below_face_rect);
+
+                                float above_mean_mag, above_mean_ang, below_mean_mag, below_mean_ang;
+
+                                above_mean_mag = cv::sum(above_face_mag_roi)[0] / (width * height_min);
+                                above_mean_ang = cv::sum(above_face_ang_roi)[0] / (width * height_min);
+
+                                below_mean_mag = cv::sum(below_face_mag_roi)[0] / (width * height_min);
+                                below_mean_ang = cv::sum(below_face_ang_roi)[0] / (width * height_min);
+    //                            float vof_above_data[] = {above_mean_mag, above_mean_ang};
+    //                            float vof_below_data[] = {below_mean_mag, below_mean_ang};
+    //                            Mat vof_above = Mat(2, 1, CV_32F, vof_above_data);
+    //                            Mat vof_below = Mat(2, 1, CV_32F, vof_below_data);
+
+                                Mat vof_above, vof_below;
+                                vof_above.push_back(above_mean_mag);
+                                vof_above.push_back(above_mean_ang);
+                                vof_below.push_back(below_mean_mag);
+                                vof_below.push_back(below_mean_ang);
+                                double ab = vof_above.dot(vof_below);
+                                double aa = vof_above.dot(vof_above);
+                                double bb = vof_below.dot(vof_below);
+                                double cos_sim_opt_flow = -ab / std::sqrt(aa * bb);
+                                ui->label_show_OF->setText(QString::number(cos_sim_opt_flow));
+                            }
+
+
+                            //TODO:
+                            // face roi based motion detection and left-right roi based histogram of
+                            // optical flow matching for jilter detection
+
+    //                        needFaceDetectionOrNot = false;
+
+    //                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
+    //                        dlib::assign_image(img, dlib::cv_image<unsigned char>(image_gray));
+    //                        int face_center_x = face_rect.x + cvRound(face_rect.width / 2.0);
+    //                        int face_center_y = face_rect.y + cvRound(face_rect.height / 2.0);
+    //                        tracker.start_track(img,
+    //                                            centered_rect(dlib::point(face_center_x,face_center_y),
+    //                                                          int(face_rect.width), int(face_rect.height)));
+                            Mat face_img = frame(face_rect);
+    //                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
+                            cv::resize(face_img, face_img,Size(128,128));
+                            Mat face_img_rgb;
+                            cv::cvtColor(face_img, face_img_rgb, cv::COLOR_BGR2RGB);
+                            QImage qimage_face = QImage((const unsigned char*)(face_img_rgb.data),
+                                                        face_img_rgb.cols, face_img_rgb.rows,
+                                                        face_img_rgb.cols*face_img_rgb.channels(),
+                                                        QImage::Format_RGB888);
+                            ui->label_face->setPixmap(QPixmap::fromImage(qimage_face));
+                            ui->label_face->resize(face_img.cols, face_img.rows);
+    //                        cv::rectangle(frame, face_rect, cv::Scalar(0,0,255));
+                        }else
+                        {
+                            ui->label_face->clear();
+                        }
+
                     }
 
                 }
