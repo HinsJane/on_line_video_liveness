@@ -88,7 +88,7 @@ void MainWindow::readFrame()
     //                    clock_t end = clock();
                         double timestamp = cv::getTickCount() / cv::getTickFrequency();
                         cv::updateMotionHistory(diff, history, timestamp, MHI_DURATION);
-                        cout <<"[Info]: History shape: " << history.rows <<" " << history.cols << endl;
+                        cout <<"[Info]: History shape: " << history.rows <<" x " << history.cols << endl;
                         double MIN, MAX;
                         cv::minMaxLoc(history, &MIN, &MAX);
                         Mat history_rgb;
