@@ -42,6 +42,104 @@ int MainWindow::maxFace(std::vector<cv::Rect> &faces)
     return std::distance(std::begin(face_areas),biggest);
 }
 
+std::vector<double> MainWindow::HOF(cv::Mat& mag_src, cv::Mat& ang_src)
+{
+    Mat abs_ang = cv::abs(ang_src);
+    std::vector<double> hof(18);
+    for(int row = 0; row < mag_src.rows; ++row){
+        for(int col = 0; col < mag_src.cols; ++col){
+            double ang = abs_ang.at<double>(row, col);
+            double mag = mag_src.at<double>(row, col);
+            double split_ratio;
+            if(0 <= ang && ang <= 10){
+                split_ratio = (ang - 0) / 10;
+                hof.at(0) += (1.0 - split_ratio) * mag;
+                hof.at(1) += split_ratio * mag;
+            }
+            if(10 <= ang && ang <= 20){
+                split_ratio = (ang - 10) / 10;
+                hof.at(1) += (1.0 - split_ratio) * mag;
+                hof.at(2) += split_ratio * mag;
+            }
+            if(20 <= ang && ang <= 30){
+                split_ratio = (ang - 20) / 10;
+                hof.at(2) += (1.0 - split_ratio) * mag;
+                hof.at(3) += split_ratio * mag;
+            }
+            if(30 <= ang && ang <= 40){
+                split_ratio = (ang - 0) / 10;
+                hof.at(3) += (1.0 - split_ratio) * mag;
+                hof.at(4) += split_ratio * mag;
+            }
+            if(40 <= ang && ang <= 50){
+                split_ratio = (ang - 0) / 10;
+                hof.at(4) += (1.0 - split_ratio) * mag;
+                hof.at(5) += split_ratio * mag;
+            }
+            if(50 <= ang && ang <= 60){
+                split_ratio = (ang - 0) / 10;
+                hof.at(5) += (1.0 - split_ratio) * mag;
+                hof.at(6) += split_ratio * mag;
+            }
+            if(60 <= ang && ang <= 70){
+                split_ratio = (ang - 0) / 10;
+                hof.at(6) += (1.0 - split_ratio) * mag;
+                hof.at(7) += split_ratio * mag;
+            }
+            if(70 <= ang && ang <= 80){
+                split_ratio = (ang - 0) / 10;
+                hof.at(7) += (1.0 - split_ratio) * mag;
+                hof.at(8) += split_ratio * mag;
+            }
+            if(80 <= ang && ang <= 90){
+                split_ratio = (ang - 0) / 10;
+                hof.at(8) += (1.0 - split_ratio) * mag;
+                hof.at(9) += split_ratio * mag;
+            }
+            if(90 <= ang && ang <= 100){
+                split_ratio = (ang - 0) / 10;
+                hof.at(9) += (1.0 - split_ratio) * mag;
+                hof.at(10) += split_ratio * mag;
+            }
+            if(100 <= ang && ang <= 110){
+                split_ratio = (ang - 0) / 10;
+                hof.at(10) += (1.0 - split_ratio) * mag;
+                hof.at(11) += split_ratio * mag;
+            }
+            if(110 <= ang && ang <= 120){
+                split_ratio = (ang - 0) / 10;
+                hof.at(11) += (1.0 - split_ratio) * mag;
+                hof.at(12) += split_ratio * mag;
+            }
+            if(120 <= ang && ang <= 130){
+                split_ratio = (ang - 0) / 10;
+                hof.at(12) += (1.0 - split_ratio) * mag;
+                hof.at(13) += split_ratio * mag;
+            }
+            if(130 <= ang && ang <= 140){
+                split_ratio = (ang - 0) / 10;
+                hof.at(13) += (1.0 - split_ratio) * mag;
+                hof.at(14) += split_ratio * mag;
+            }
+            if(140 <= ang && ang <= 150){
+                split_ratio = (ang - 0) / 10;
+                hof.at(14) += (1.0 - split_ratio) * mag;
+                hof.at(15) += split_ratio * mag;
+            }
+            if(150 <= ang && ang <= 160){
+                split_ratio = (ang - 0) / 10;
+                hof.at(15) += (1.0 - split_ratio) * mag;
+                hof.at(16) += split_ratio * mag;
+            }
+            if(160 <= ang && ang <= 170){
+                split_ratio = (ang - 0) / 10;
+                hof.at(16) += (1.0 - split_ratio) * mag;
+                hof.at(17) += split_ratio * mag;
+            }
+        }
+    }
+}
+
 
 void MainWindow::readFrame()
 {
@@ -107,7 +205,6 @@ void MainWindow::readFrame()
 //                        if (cv::waitKey(1) == 27)
 //                            exit(EXIT_SUCCESS);
 
-
                         if(faces.size() !=0)
                         {
                             qDebug() << "[Info]: Face detected ------------ > > >";
@@ -170,8 +267,6 @@ void MainWindow::readFrame()
 
                                 Rect above_face_rect = Rect(left, top - height_min, width, height_min);
                                 Rect below_face_rect = Rect(left, top + height, width, height_min);
-
-    //                            count << "[Info]: " << ""
 
                                 Mat above_face_mag_roi = magnitude(above_face_rect);
                                 Mat above_face_ang_roi = angle(above_face_rect);

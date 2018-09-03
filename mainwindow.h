@@ -70,6 +70,7 @@ private:
 
 private:
     int maxFace(std::vector<cv::Rect> &faces);
+    std::vector<double> HOF(cv::Mat& mag_src, cv::Mat& ang_src);
     double MHI_DURATION = 0.5;
     double DEFAULT_THRESHOLD = 32;
     double MAX_TIME_DELTA = 0.25;
