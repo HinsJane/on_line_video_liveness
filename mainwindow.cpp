@@ -109,7 +109,7 @@ void MainWindow::readFrame()
 
                     if(faces.size() !=0)
                     {
-                        cout << "[Info]: Face detected ------------ \n";
+                        cout << "[Info]: Face detected ------------ > > >\n";
                         max_face_index = maxFace(faces);
                         cv::Rect face_rect = faces.at(max_face_index);
 
